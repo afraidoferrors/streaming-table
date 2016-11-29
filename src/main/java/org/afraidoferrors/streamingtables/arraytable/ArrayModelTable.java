@@ -75,7 +75,31 @@ public class ArrayModelTable<T> implements ModelTable<T>, Workspace<T> {
 
 	@Override
 	public void supply(Consumer<ModelQueue<T>> queue) {
-		// TODO Auto-generated method stub
+		for (int rowNum = 0; rowNum < data.length; rowNum++) {
+			for (int colNum = 0; colNum < data[rowNum].length; colNum++) {
+				for (WorkspaceBundle<T> bundle : this.bundles) {
+					// Check predicates
+					boolean goOn = true;
+					if (goOn) {
+						goOn = bundle.onRows.test(new ArrayRow<>(rowNum, this.data));
+					}
+					if (goOn) {
+						goOn = bundle.onColumns.test(new ArrayColumn<>(colNum, this.data));
+					}
+					if (goOn) {
+						goOn = bundle.onCells.test(new ArrayCell<>(rowNum, colNum, this.data));
+					}
+
+					if (goOn) {
+						final ArrayModelQueue<T> dataqueue = new ArrayModelQueue<T>(rowNum, colNum);
+
+						bundle.cellCursor.accept(new ArrayCellCursor<T>(rowNum, colNum, data, dataqueue));
+						// do stuff
+						queue.accept(dataqueue);
+					}
+				}
+			}
+		}
 
 	}
 

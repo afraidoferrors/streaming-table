@@ -2,12 +2,6 @@ package org.afraidoferrors.streamingtables.arraytable;
 
 import org.afraidoferrors.streamingtables.table.Cell;
 
-/**
- * 
- * @author Martin Weik
- *
- * @param <T>
- */
 public class ArrayCell<T> implements Cell<T> {
 
 	private final int row;

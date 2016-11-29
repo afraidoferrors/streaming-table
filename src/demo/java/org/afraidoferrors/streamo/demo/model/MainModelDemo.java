@@ -4,8 +4,15 @@ import java.util.List;
 
 import org.afraidoferrors.streamingtables.arraytable.ArrayTable;
 
+/**
+ * This Demo demonstrates the construction of objects from a table where the entities are distributed over 3 rows. 
+ * @author Martin
+ *
+ */
+
 public class MainModelDemo {
 
+	
 	public static void main(String[] args) {
 		String[] days = { "Day", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
 		String[] dish1code = { "Code", "a01", "a02", "a04", "a03", "a05" };
@@ -18,13 +25,20 @@ public class MainModelDemo {
 
 		ArrayTable<String> dishestable = new ArrayTable<>(data);
 
-		List<Dish> dishes = dishestable.modelstream().workspace().onRows(r -> r.cellAt(0).value().equals("Code"))
-				.onColumns(c -> c.position() > 0).collect(cc -> {
+		List<Dish> dishes = dishestable.modelstream().workspace()
+				//onRows restricts the cursor where the given Predicate is true (in this case: The cell in the first column equals "Code")
+				.onRows(r -> r.cellAt(0).value().equals("Code"))
+				//onColumns restricts the cursor where the given Predicate is true (in this case: All rows except the first one)
+				.onColumns(c -> c.position() > 0)
+				//tell the library the cells to visit relative to the cursors position
+				.collect(cc -> {
 					cc.row(0);
 					cc.it();
 					cc.down(1);
 					cc.down(2);
-				}).asList(q -> new Dish(q.poll(), q.poll(), q.poll(), q.poll()));
+				}).
+				//asList executes the given Function for every dataset and returns the results as List
+				asList(q -> new Dish(q.poll(), q.poll(), q.poll(), q.poll()));
 
 		for (Dish dish : dishes) {
 			System.out.println(dish);
